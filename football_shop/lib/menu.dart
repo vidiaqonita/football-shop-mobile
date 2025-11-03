@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ItemHomepage {
- final String name;
- final IconData icon;
-
- ItemHomepage(this.name, this.icon);
+  final String name;
+  final IconData icon;
+  final Color color; 
+  ItemHomepage(this.name, this.icon, this.color);
 }
 
 class MyHomePage extends StatelessWidget {
@@ -15,9 +15,9 @@ class MyHomePage extends StatelessWidget {
   final String kelas = "B"; //kelas
 
   final List<ItemHomepage> items = [
-    ItemHomepage("See Football Shop", Icons.shop),
-    ItemHomepage("Add Product", Icons.add),
-    ItemHomepage("Logout", Icons.logout),
+    ItemHomepage("All Products", Icons.shop, Colors.blue),
+    ItemHomepage("My Products", Icons.shop_2, Colors.green),
+    ItemHomepage("Create Product", Icons.create, Colors.red),
   ];
   @override
     Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       // AppBar adalah bagian atas halaman yang menampilkan judul.
       appBar: AppBar(
-        // Judul aplikasi "Football News" dengan teks putih dan tebal.
+        // Judul aplikasi "Football Shop" dengan teks putih dan tebal.
         title: const Text(
           'Football Shop',
           style: TextStyle(
@@ -110,7 +110,7 @@ class ItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       // Menentukan warna latar belakang dari tema aplikasi.
-      color: Theme.of(context).colorScheme.secondary,
+      color: item.color,
       // Membuat sudut kartu melengkung.
       borderRadius: BorderRadius.circular(12),
 
