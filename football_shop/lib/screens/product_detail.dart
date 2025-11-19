@@ -67,7 +67,7 @@ class ProductDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Category and Date
+                  // Category 
                   Row(
                     children: [
                       Container(

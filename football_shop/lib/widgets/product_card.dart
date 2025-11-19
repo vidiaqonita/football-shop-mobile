@@ -6,6 +6,7 @@ import 'package:football_shop/screens/login.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
+// Ganti BASE_URL ini ke http://10.0.2.2:8000 jika menggunakan Android Emulator
 // ignore: constant_identifier_names
 const String BASE_URL = "http://localhost:8000"; 
 
@@ -33,12 +34,13 @@ class ItemCard extends StatelessWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!")));
+          
           // Navigate ke route yang sesuai (tergantung jenis tombol)
           if (item.name == "Add Product") {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductFormPage(),
+                builder: (context) => const ProductFormPage(),
               )
             );
           }
@@ -46,15 +48,23 @@ class ItemCard extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ProductEntryListPage()
+                      // Panggil ProductEntryListPage tanpa filter (default: false)
+                      builder: (context) => const ProductEntryListPage() 
                   ),
               );
           }
+          // Logika untuk "My Products" (Memanggil daftar dengan filter)
+          else if (item.name == "My Products") {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      // Meneruskan flag filterByUser=true ke ProductEntryListPage
+                      builder: (context) => const ProductEntryListPage(filterByUser: true) 
+                  ),
+              );
+          }
+          // Logika untuk "Logout"
           else if (item.name == "Logout") {
-              // TODO: Replace the URL with your app's URL and don't forget to add a trailing slash (/)!
-              // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
-              // If you using chrome,  use URL http://localhost:8000
-              
               final response = await request.logout(
                   "$BASE_URL/auth/logout/");
               String message = response["message"];
@@ -62,7 +72,7 @@ class ItemCard extends StatelessWidget {
                   if (response['status']) {
                       String uname = response["username"];
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text("$message See you again, $uname."),
+                          content: Text("$message Sampai jumpa lagi, $uname."),
                       ));
                       Navigator.pushReplacement(
                           context,
@@ -104,5 +114,4 @@ class ItemCard extends StatelessWidget {
       ),
     );
   }
-
 }

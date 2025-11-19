@@ -4,15 +4,14 @@
 
 import 'dart:convert';
 
-List<ProductEntry> newsEntryFromJson(String str) => List<ProductEntry>.from(json.decode(str).map((x) => ProductEntry.fromJson(x)));
+List<ProductEntry> productEntryFromJson(String str) => List<ProductEntry>.from(json.decode(str).map((x) => ProductEntry.fromJson(x)));
 
-String newsEntryToJson(List<ProductEntry> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String productEntryToJson(List<ProductEntry> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class ProductEntry {
     String id;
     String name;
     int price;
-    int stock;
     String description;
     String category;
     String? thumbnail; // <-- UBAH KE String?
@@ -23,7 +22,6 @@ class ProductEntry {
         required this.id,
         required this.name,
         required this.price,
-        required this.stock,
         required this.description,
         required this.category,
         this.thumbnail, 
@@ -34,8 +32,7 @@ class ProductEntry {
     factory ProductEntry.fromJson(Map<String, dynamic> json) => ProductEntry(
         id: json["id"] ?? "",
         name: json["name"] ?? "No Name",
-        price: json["news_views"] ?? 0,
-        stock: json["news_views"] ?? 0,
+        price: json["price"] ?? 0,
         description: json["description"] ?? "No Description",
         category: json["category"] ?? "new",
         thumbnail: json["thumbnail"] as String?, // <-- CAST to String?
@@ -47,7 +44,6 @@ class ProductEntry {
         "id": id,
         "name": name,
         "price": price,
-        "stock": stock,
         "description": description,
         "category": category,
         "thumbnail": thumbnail,

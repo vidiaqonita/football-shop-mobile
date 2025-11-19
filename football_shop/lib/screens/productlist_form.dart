@@ -15,8 +15,6 @@ class ProductFormPageState extends State<ProductFormPage> {
     final _formKey = GlobalKey<FormState>();
     String _name = "";
     int _price = 0;
-    // === 1. TAMBAH VARIABEL STATE _stock ===
-    int _stock = 0; 
     String _description = "";
     String _category = "new"; // default (Spasi dihilangkan)
     String _thumbnail = "";
@@ -33,13 +31,10 @@ class ProductFormPageState extends State<ProductFormPage> {
     ];
 
     final TextEditingController _priceController = TextEditingController();
-    // === 2. TAMBAH CONTROLLER UNTUK _stock ===
-    final TextEditingController _stockController = TextEditingController();
 
     @override
     void dispose() {
       _priceController.dispose();
-      _stockController.dispose();
       super.dispose();
     }
     
@@ -126,50 +121,6 @@ class ProductFormPageState extends State<ProductFormPage> {
                         }
                         if (int.parse(value) <= 0) {
                             return "Harga harus lebih dari 0!";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-
-                  // === 3. STOCK (BARU DITAMBAHKAN) ===
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: _stockController,
-                      keyboardType: TextInputType.number, 
-                      decoration: InputDecoration(
-                        hintText: "Stok produk",
-                        labelText: "Stok produk",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                          borderSide: BorderSide(
-                            color: Colors.blue, 
-                          ),
-                        ),
-                      ),
-                      onChanged: (String? value) {
-                        setState(() {
-                          // Mencoba parse ke int
-                          if (value != null && value.isNotEmpty) {
-                            try {
-                              _stock = int.parse(value);
-                            } catch (e) {
-                              _stock = 0; 
-                            }
-                          }
-                        });
-                      },
-                      validator: (String? value) {
-                        if (value == null || value.isEmpty) {
-                          return "Stok produk tidak boleh kosong!";
-                        }
-                        if (int.tryParse(value) == null) {
-                            return "Stok harus berupa angka!";
-                        }
-                         // Stok boleh 0, tapi tidak boleh negatif
-                        if (int.parse(value) < 0) {
-                            return "Stok tidak boleh negatif!";
                         }
                         return null;
                       },
@@ -278,7 +229,7 @@ class ProductFormPageState extends State<ProductFormPage> {
                       child: ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(Colors.blue),
+                              WidgetStateProperty.all(Colors.blue),
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
@@ -287,11 +238,10 @@ class ProductFormPageState extends State<ProductFormPage> {
                             // If you using chrome,  use URL http://localhost:8000
                             
                             final response = await request.postJson(
-                              "http://10.0.2.2:8000/create-flutter/",
+                              "http://localhost:8000/create-flutter/",
                               jsonEncode({
                                 "name": _name,
                                 "price": _price,
-                                "stock": _stock,
                                 "description": _description,
                                 "thumbnail": _thumbnail,
                                 "category": _category,
@@ -302,7 +252,7 @@ class ProductFormPageState extends State<ProductFormPage> {
                               if (response['status'] == 'success') {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(const SnackBar(
-                                  content: Text("Product successfully saved!"),
+                                  content: Text("Product successfully added!"),
                                 ));
                                 Navigator.pushReplacement(
                                   context,
@@ -332,22 +282,3 @@ class ProductFormPageState extends State<ProductFormPage> {
         );
     }
 }
-
-//     String _name = "";
-//     int _price = 0;
-//     // === 1. TAMBAH VARIABEL STATE _stock ===
-//     int _stock = 0; 
-//     String _description = "";
-//     String _category = "new"; // default (Spasi dihilangkan)
-//     String _thumbnail = "";
-//     bool _isFeatured = false; // default
-
-//     final List<String> _categories = [
-//       'new',
-//       'apparel',
-//       'kids',
-//       'brands',
-//       'footwear',
-//       'equipment',
-//       'sale',
-//     ];

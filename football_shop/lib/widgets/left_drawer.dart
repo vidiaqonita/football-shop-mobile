@@ -2,11 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:football_shop/screens/menu.dart';
 import 'package:football_shop/screens/productlist_form.dart';
 import 'package:football_shop/screens/product_entry_list.dart';
+import 'package:football_shop/screens/login.dart'; // Import halaman login
+import 'package:pbp_django_auth/pbp_django_auth.dart'; // Import provider auth
+import 'package:provider/provider.dart'; // Import provider
+
+// Ganti BASE_URL ini ke http://10.0.2.2:8000 jika menggunakan Android Emulator
+// ignore: constant_identifier_names
+const String BASE_URL = "http://localhost:8000"; 
+
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>(); // Ambil request provider
+    
     return Drawer(
       child: ListView(
         children: [
@@ -28,7 +38,6 @@ class LeftDrawer extends StatelessWidget {
                 Padding(padding: EdgeInsets.all(10)),
                 Text(
                   "Seluruh produk sepak bola terkini di sini!",
-                    // TODO: Tambahkan gaya teks dengan center alignment, font ukuran 15, warna putih, dan weight biasa
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -39,11 +48,11 @@ class LeftDrawer extends StatelessWidget {
               ],
             ),
           ),
-          // TODO: Bagian routing
+          
+          // --- HOME ---
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
-            // Bagian redirection ke MyHomePage
             onTap: () {
               Navigator.pushReplacement(
                   context,
@@ -52,32 +61,65 @@ class LeftDrawer extends StatelessWidget {
                   ));
             },
           ),
+          
+          // --- ADD PRODUCT ---
           ListTile(
             leading: const Icon(Icons.post_add),
             title: const Text('Add Product'),
-            // Bagian redirection ke ProductFormPage
             onTap: () {
-              /*
-              TODO: Buatlah routing ke ProductFormPage di sini,
-              setelah halaman ProductFormPage sudah dibuat.
-              */
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProductFormPage(),
+                  builder: (context) => const ProductFormPage(),
                 )
               );
             },
           ),
+          
+          // --- PRODUCT LIST ---
           ListTile(
-              leading: const Icon(Icons.add_reaction_rounded),
+              leading: const Icon(Icons.list_alt), // Mengubah ikon agar lebih sesuai
               title: const Text('Product List'),
               onTap: () {
-                  // Route to product list page
+                  // Route ke ProductEntryListPage (menampilkan semua produk secara default)
                   Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const ProductEntryListPage()),
                   );
+              },
+          ),
+          
+          // --- LOGOUT (Tambahan Baru) ---
+          ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () async {
+                  // Panggil fungsi logout dari CookieRequest
+                  final response = await request.logout(
+                      "$BASE_URL/auth/logout/"); 
+                  
+                  String message = response["message"];
+                  
+                  if (context.mounted) {
+                      if (response['status']) {
+                          String uname = response["username"] ?? "User";
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Berhasil logout! Sampai jumpa lagi, $uname."),
+                          ));
+                          
+                          // Arahkan ke halaman login
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LoginPage()),
+                          );
+                      } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text("Gagal logout: $message"),
+                              ),
+                          );
+                      }
+                  }
               },
           ),
         ],
