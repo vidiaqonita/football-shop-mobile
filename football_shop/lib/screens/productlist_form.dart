@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:football_shop/widgets/left_drawer.dart';
-
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:football_shop/screens/menu.dart';
 class ProductFormPage extends StatefulWidget {
     const ProductFormPage({super.key});
 
@@ -42,6 +45,7 @@ class ProductFormPageState extends State<ProductFormPage> {
     
     @override
     Widget build(BuildContext context) {
+        final request = context.watch<CookieRequest>();
         return Scaffold(
           appBar: AppBar(
             title: const Center(
@@ -276,50 +280,42 @@ class ProductFormPageState extends State<ProductFormPage> {
                           backgroundColor:
                               MaterialStateProperty.all(Colors.blue),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Produk berhasil disimpan!'),
-                                  content: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Name: $_name'),
-                                        Text('Harga: $_price'),
-                                        // === 4. TAMPILKAN _stock DI POP-UP ===
-                                        Text('Stok: $_stock'), 
-                                        Text('Deskripsi: $_description'),
-                                        Text('Kategori: $_category'),
-                                        Text('Thumbnail: $_thumbnail'),
-                                        Text(
-                                          'Unggulan: ${_isFeatured ? "Ya" : "Tidak"}'),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      child: const Text('OK'),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        _formKey.currentState!.reset();
-                                        _priceController.clear();
-                                        _stockController.clear(); // Bersihkan stock
-                                        setState(() {
-                                            _price = 0;
-                                            _stock = 0;
-                                            _isFeatured = false;
-                                            _category = 'new';
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
+                            // TODO: Replace the URL with your app's URL
+                            // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
+                            // If you using chrome,  use URL http://localhost:8000
+                            
+                            final response = await request.postJson(
+                              "http://10.0.2.2:8000/create-flutter/",
+                              jsonEncode({
+                                "name": _name,
+                                "price": _price,
+                                "stock": _stock,
+                                "description": _description,
+                                "thumbnail": _thumbnail,
+                                "category": _category,
+                                "is_featured": _isFeatured,
+                              }),
                             );
+                            if (context.mounted) {
+                              if (response['status'] == 'success') {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Product successfully saved!"),
+                                ));
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyHomePage()),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Something went wrong, please try again."),
+                                ));
+                              }
+                            }
                           }
                         },
                         child: const Text(
@@ -336,3 +332,22 @@ class ProductFormPageState extends State<ProductFormPage> {
         );
     }
 }
+
+//     String _name = "";
+//     int _price = 0;
+//     // === 1. TAMBAH VARIABEL STATE _stock ===
+//     int _stock = 0; 
+//     String _description = "";
+//     String _category = "new"; // default (Spasi dihilangkan)
+//     String _thumbnail = "";
+//     bool _isFeatured = false; // default
+
+//     final List<String> _categories = [
+//       'new',
+//       'apparel',
+//       'kids',
+//       'brands',
+//       'footwear',
+//       'equipment',
+//       'sale',
+//     ];
